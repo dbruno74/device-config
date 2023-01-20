@@ -16,7 +16,7 @@ You can install the snap package that you built with
 snap install config-snap --dangerous
 ```
 
-Please do not forget to add required plugs (network-control, snapd-control) in your gadget snap file beforehand. Otherwise, config-snap will not work!
+Please do not forget to add required plugs (network-setup-control, snapd-control) in your gadget snap file beforehand. Otherwise, config-snap will not work!
 Note that for snapd-control plugin, that's a super-priledged interface, additionally you need to contact support and ask for interface auto-connection.
 
 
