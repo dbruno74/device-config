@@ -22,7 +22,7 @@ Note that for snapd-control plugi, that's a super-priledged interface, additiona
 
 ## Configuration
 ### Network configuration
-Initial configuration could be done by tweaking the `connect-plug-account-control` and `connect-plug-network-setup-control` script
+Initial configuration could be done by tweaking the `connect-plug-account-control` and `connect-plug-network-setup-control` script.
 You can change netplan config at runtime using snap set as described below:
 
 ```
