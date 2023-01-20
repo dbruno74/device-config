@@ -1,0 +1,57 @@
+#! /bin/sh
+
+HTTP_SERVER_IP=192.168.1.100
+HTTP_SERVER_PORT=8012
+ASSERT_NAME="system-user-qed.assert"
+
+echo http server is $HTTP_SERVER_IP:$HTTP_SERVER_PORT
+echo assertion file name is $ASSERT_NAME
+
+while [ $(curl -sL -w %{http_code} $HTTP_SERVER_IP:$HTTP_SERVER_PORT -o /dev/null) != "200" ]
+do
+   echo "Http server unreachable, retrying in 1 sec"
+   sleep 1
+done
+
+echo "Http server is up!" 
+
+echo getting system user assertion ...
+#ASSERT=$(curl http://$HTTP_SERVER_IP:$HTTP_SERVER_PORT/$ASSERT_NAME) 
+#echo $ASSERT 
+curl http://$HTTP_SERVER_IP:$HTTP_SERVER_PORT/$ASSERT_NAME > /tmp/system-user.assert
+if [ $? = 0 ]
+then
+  echo getting system user assertion done!
+else
+  echo getting system user assertion failed!
+fi
+
+echo posting assertion ...
+#echo $ASSERT | curl -v -sS --unix-socket /run/snapd.socket --trace log.log -X  POST http://localhost/v2/assertions -H 'Content-Type: application/x.ubuntu.assertion' -d @-
+#curl -sS --unix-socket /run/snapd.socket --trace /tmp/curllog.log -X POST http://localhost/v2/assertions -H 'Content-Type: application/x.ubuntu.assertion' --data-binary @/tmp/system-user.assert 
+curl -sS --unix-socket /run/snapd.socket -X POST http://localhost/v2/assertions -H 'Content-Type: application/x.ubuntu.assertion' --data-binary @/tmp/system-user.assert 
+if [ $? = 0 ]
+then
+  echo posting assertion done!
+else
+  echo posting assertion failed!
+fi
+
+echo creating system user ...
+curl -sS --unix-socket /run/snapd.socket -X POST http://localhost/v2/users -d '{ "action": "create", "sudoers": true, "known": true, "force-managed": true }'
+if [ $? = 0 ]
+then
+  echo creating system user done!
+else
+  echo creating system user failed!
+fi
+
+echo removing assertion file from tmp ...
+rm -rf /tmp/system-user.assert
+if [ $? = 0 ]
+then
+  echo removing assertion file from tmp done!
+else
+  echo removing assertion file from tmp failed!
+fi
+
